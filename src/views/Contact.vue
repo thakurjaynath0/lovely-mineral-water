@@ -1,8 +1,11 @@
 <script setup>
 import { reactive, ref } from 'vue'
 
+const WEB3FORMS_ACCESS_KEY = "edbf8567-c8d7-4579-8c5b-15e17fef7a95"
+
 const form = reactive({
   name: '',
+  email: '',
   phone: '',
   address: '',
   cans: '1',
@@ -10,10 +13,46 @@ const form = reactive({
 })
 
 const sent = ref(false)
+const submitting = ref(false)
+const error = ref('')
 
-function submitOrder() {
-  // No backend wired up yet — replace this with your API/WhatsApp integration.
-  sent.value = true
+async function submitOrder() {
+  if (!WEB3FORMS_ACCESS_KEY) {
+    error.value = 'Web3Forms access key is not configured. Add VITE_WEB3FORMS_ACCESS_KEY to your .env file.'
+    return
+  }
+
+  submitting.value = true
+  error.value = ''
+
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_ACCESS_KEY,
+        subject: `New Contact Request from ${form.name || 'Website Visitor'}`,
+        from_name: 'Lovely Mineral Water Supply - Contact Form',
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        address: form.address || 'Not provided',
+        message: form.message || 'No message provided'
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok || data.success === false) {
+      throw new Error(data.error?.message || 'Unable to send request. Please try again.')
+    }
+
+    sent.value = true
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Request failed. Please try again.'
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
@@ -38,7 +77,7 @@ function submitOrder() {
           </div>
           <div>
             <h3>Phone / WhatsApp</h3>
-            <a href="tel:+910000000000">+91 70220 19420</a>
+            <a href="tel:+917022019420">+91 70220 19420, +91 91087 03403</a>
           </div>
         </div>
 
@@ -48,7 +87,7 @@ function submitOrder() {
           </div>
           <div>
             <h3>Email</h3>
-            <a href="mailto:hello@lovelymineralwater.in">hello@lovelymineralwater.in</a>
+            <a href="mailto:lovelybk96@gmail.com">lovelybk96@gmail.com</a>
           </div>
         </div>
 
@@ -57,8 +96,8 @@ function submitOrder() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.3 7-11.5A7 7 0 0 0 5 9.5C5 14.7 12 21 12 21Z" fill="#2BB6C4"/></svg>
           </div>
           <div>
-            <h3>Service area</h3>
-            <p>12, Water Tank Road, Anna Nagar, Chennai, Tamil Nadu 600040</p>
+            <h3>Address</h3>
+            <p>1st Main Rd, 1st cross, Venkateshwara Layout, S.G. Palya, Bengaluru, Karnataka 560029</p>
           </div>
         </div>
 
@@ -68,14 +107,14 @@ function submitOrder() {
           </div>
           <div>
             <h3>Delivery hours</h3>
-            <p>7:00 AM – 9:00 PM, all days of the week</p>
+            <p>Opens 24 hours, all days of the week</p>
           </div>
         </div>
 
         <div class="map-frame">
           <iframe
             title="Service area map"
-            src="https://www.google.com/maps?q=Anna%20Nagar%2C%20Chennai&output=embed"
+              src="https://www.google.com/maps?q=1st%20Main%20Rd%2C%201st%20cross%2C%20Venkateshwara%20Layout%2C%20S.G.%20Palya%2C%20Bengaluru%2C%20Karnataka%20560029&output=embed"
             width="100%"
             height="220"
             style="border:0"
@@ -94,6 +133,11 @@ function submitOrder() {
           <div class="field">
             <label for="name">Your name</label>
             <input id="name" v-model="form.name" type="text" placeholder="e.g. Priya Raman" required />
+          </div>
+
+          <div class="field">
+            <label for="email">Email address (optional)</label>
+            <input id="email" v-model="form.email" type="email" placeholder="e.g. example@email.com" />
           </div>
 
           <div class="field">
@@ -121,7 +165,11 @@ function submitOrder() {
             <textarea id="message" v-model="form.message" rows="2" placeholder="Preferred delivery time, landmark, etc."></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary submit-btn">Send Request</button>
+          <button type="submit" class="btn btn-primary submit-btn" :disabled="submitting">
+            {{ submitting ? 'Sending...' : 'Send Request' }}
+          </button>
+
+          <p v-if="error" class="error-note">{{ error }}</p>
         </form>
 
         <div v-else class="success-note">

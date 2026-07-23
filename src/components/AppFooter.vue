@@ -19,7 +19,7 @@ const year = new Date().getFullYear()
       <div class="footer-col">
         <h4>Reach us</h4>
         <a href="tel:+910000000000">+91 70220 19420</a>
-        <a href="mailto:hello@lovelymineralwater.in">hello@lovelymineralwater.in</a>
+        <a href="mailto:lovelybk96@gmail.com">lovelybk96@gmail.com</a>
         <span>7:00 AM – 9:00 PM, all days</span>
       </div>
     </div>
