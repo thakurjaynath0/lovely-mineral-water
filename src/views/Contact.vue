@@ -114,7 +114,7 @@ async function submitOrder() {
         <div class="map-frame">
           <iframe
             title="Service area map"
-              src="https://www.google.com/maps/place/Lovely+Minerals+drinking+water+supply/@12.9308978,77.6070028,872m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3bae159dbbc1ce8d:0x61dcfda9da50e51c!8m2!3d12.9308978!4d77.6070028!16s%2Fg%2F11y3xhg1hm?entry=ttu&g_ep=EgoyMDI2MDcyMC4wIKXMDSoASAFQAw%3D%3D"
+            src="https://maps.google.com/maps?q=12.9308978,77.6070028&z=16&output=embed"
             width="100%"
             height="220"
             style="border:0"
